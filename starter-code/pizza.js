@@ -1,83 +1,71 @@
 // Write your Pizza Builder JavaScript in this file.
 $(document).ready(function() {
 
-//por defecto con gluten y sin salsa y con la base y los 3 toppings solo
-
-function reset () {
+  //por defecto con gluten y sin salsa y con la base y los 3 toppings solo
   $(".btn").removeClass("active");
-  $(".btn-pepperoni").removeClass("active");
   $(".crust").removeClass("crust-gluten-free");
-  $(".pep").hide();
-  $(".mushroom").hide();
-  $(".green-pepper").hide();
-  $(".sauce").hide();
-  $(".price ul li:contains($1 pepperonni)").hide();
-  $(".price ul li:contains($1 mushrooms)").hide();
-  $(".price ul li:contains($1 green peppers)").hide();
-  $(".price ul li:contains($3 white sauce)").hide();
-  $(".price ul li:contains($5 gluten-free crust)").hide();
-  $(".strong").text("$10");
-}
-reset();
-//ejecución de los botones
+  $(".sauce").removeClass("sauce-white");
+
+  $(".pep, .mushroom, .green-pepper, .sauce, .price ul li").hide();
+
+  $("strong").text("$10");
 });
 
-$(".btn-pepperonni").click(function() {
-if($(this).hasClass("active")){
-  $(".pep").hide();
-  $(this).removeClass("active");
-  $(".price ul li:contains($1 pepperonni)").hide();
-} else {
-  $(".pep").show();
-  $(this).addClass("active");
-  $(".price ul li:contains($1 pepperonni)").show();
-}
-});
+function handleBtn(btnClass, ingredientClass) {
+  $(btnClass).click(function() {
+    $(this).toggleClass("active");
 
-$(".btn-mushrooms").click(function() {
-if($(this).hasClass("active")){
-  $(".mushroom").hide();
-  $(this).removeClass("active");
-  $(".price ul li:contains($1 mushrooms)").hide();
-} else {
-  $(".mushroom").show();
-  $(this).addClass("active");
-  $(".price ul li:contains($1 mushrooms)").show();
-}
-});
+    $(ingredientClass).toggle();
 
-$(".btn-green-peppers").click(function() {
-if($(this).hasClass("active")){
-  $(".green-pepper").hide();
-  $(this).removeClass("active");
-  $(".price ul li:contains($1 green peppers)").hide();
-} else {
-  $(".green-pepper").show();
-  $(this).addClass("active");
-  $(".price ul li:contains($1 green peppers)").show();
+    updatePrice();
+  });
 }
-});
+
+handleBtn(".btn-pepperonni", ".pep");
+handleBtn(".btn-mushrooms", ".mushroom");
+handleBtn(".btn-green-peppers", ".green-pepper");
 
   $(".btn-sauce").click(function() {
   if($(this).hasClass("active")){
-    $(".sauce").show();
+    $(".sauce").hide();
     $(this).removeClass("active");
     $(".price ul li:contains($3 white sauce)").hide();
   } else {
-    $(".sauce").hide();
+    $(".sauce").show();
     $(this).addClass("active");
     $(".price ul li:contains($3 white sauce)").show();
   }
   });
 
   $(".btn-crust").click(function() {
+    $(".crust").toggleClass("crust-gluten-free");
   if($(this).hasClass("active")){
-    $(".crust").show();
     $(this).removeClass("active");
     $(".price ul li:contains($5 gluten-free crust)").hide();
   } else {
-    $(".crust").hide();
     $(this).addClass("active");
     $(".price ul li:contains($5 gluten-free crust)").show();
   }
   });
+
+function updatePrice() {
+  var total = 10;
+
+  $(".price li").hide();
+
+  //iterate over active toppings
+  $(".btn.active").toArray().forEach(function(btn, index) {
+    var ingredient = $(btn).text().toLowerCase();
+    var $listElement = $("li:contains('" + ingredient + "')");
+
+    var ingredientPrice = Number(
+      $listElement.text().split(" ")[0].replace("$","")
+    );
+
+    total += ingredientPrice;
+
+    $listElement.show();
+  });
+
+  $(".price strong").text("$" + total);
+}
